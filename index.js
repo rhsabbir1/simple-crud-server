@@ -28,14 +28,21 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const database = client.db("usersDB");
+    const userCollection = database.collection("users");
 
-    app.post('/users',(req, res)=>{
-        const newUser = req.body;
-        console.log(newUser)
+    app.get('/users',async(req , res)=>{
+        const curcor = userCollection.find()
+        const result = await curcor.toArray()
+        res.send(result)
     })
 
-
-
+    app.post('/users',async(req, res)=>{
+        const newUser = req.body;
+        console.log(newUser)
+        const result = await userCollection.insertOne(newUser);
+        res.send(result)
+    })
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
