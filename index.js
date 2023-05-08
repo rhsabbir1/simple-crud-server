@@ -1,7 +1,7 @@
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 5000;
-const cors= require('cors')
+const cors = require('cors')
 
 // user -----  rhsabbir090
 // password -----  1ceXGukmb1NCTOkX
@@ -12,7 +12,7 @@ app.use(express.json())
 
 
 
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const uri = "mongodb+srv://rhsabbir090:1ceXGukmb1NCTOkX@cluster0.vhijgnu.mongodb.net/?retryWrites=true&w=majority";
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
@@ -31,17 +31,25 @@ async function run() {
     const database = client.db("usersDB");
     const userCollection = database.collection("users");
 
-    app.get('/users',async(req , res)=>{
-        const curcor = userCollection.find()
-        const result = await curcor.toArray()
-        res.send(result)
+    app.get('/users', async (req, res) => {
+      const curcor = userCollection.find()
+      const result = await curcor.toArray()
+      res.send(result)
     })
 
-    app.post('/users',async(req, res)=>{
-        const newUser = req.body;
-        console.log(newUser)
-        const result = await userCollection.insertOne(newUser);
-        res.send(result)
+    app.post('/users', async (req, res) => {
+      const newUser = req.body;
+      console.log(newUser)
+      const result = await userCollection.insertOne(newUser);
+      res.send(result)
+    })
+
+    app.delete('/users/:id', async(req, res) => {
+      const id = req.params.id;
+      console.log('delete id' , id)
+      const query = { _id : new ObjectId(id) };
+      const result = await userCollection.deleteOne(query);
+      res.send(result)
     })
 
     // Send a ping to confirm a successful connection
@@ -54,14 +62,10 @@ async function run() {
 }
 run().catch(console.dir);
 
-
-
-
-
-app.get('/' , (req , res)=>{
-    res.send('Server is running')
+app.get('/', (req, res) => {
+  res.send('Server is running')
 })
 
-app.listen(port ,()=>{
-    console.log(`server on running port ${port}`)
+app.listen(port, () => {
+  console.log(`server on running port ${port}`)
 })
